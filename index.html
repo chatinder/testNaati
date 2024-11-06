@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Access Page</title>
+    <style>
+        /* Simple styling to center the content */
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
+        .container { text-align: center; }
+        .notice { font-size: 0.9em; color: gray; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Audio Access</h1>
+        <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
+        <!-- Audio player -->
+        <audio id="audioPlayer" controls oncontextmenu="return false;">
+            <source src="test.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- Script to prevent right-click and download -->
+    <script>
+        // Prevent right-clicking on the page
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Disable the keyboard shortcuts for downloading
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
+                event.preventDefault();
+                alert("Downloading is disabled on this page.");
+            }
+        });
+    </script>
+</body>
+</html>
