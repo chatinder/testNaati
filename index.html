@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Access Page</title>
     <style>
-        /* Simple styling to center the content */
+        /* Centering and styling */
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
         .container { text-align: center; }
         .notice { font-size: 0.9em; color: gray; }
@@ -17,8 +17,8 @@
     <div class="container">
         <h1>Student Audio Access</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
-        <!-- Audio element without controls -->
-        <audio id="audioPlayer" oncontextmenu="return false;">
+        <!-- Hidden audio element without controls -->
+        <audio id="audioPlayer" style="display: none;">
             <source src="test.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
@@ -45,8 +45,10 @@
             }
         });
 
-        // Prevent right-click and download shortcuts
+        // Disable right-click context menu to prevent download options
         document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Block common keyboard shortcuts that could trigger download or print
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
                 event.preventDefault();
@@ -56,4 +58,3 @@
     </script>
 </body>
 </html>
-
