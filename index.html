@@ -9,25 +9,44 @@
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
         .container { text-align: center; }
         .notice { font-size: 0.9em; color: gray; }
+        .custom-audio-controls { margin-top: 10px; }
+        button { padding: 10px 20px; font-size: 1em; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Student Audio Access</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
-        <!-- Audio player -->
-        <audio id="audioPlayer" controls oncontextmenu="return false;">
+        <!-- Audio element without controls -->
+        <audio id="audioPlayer" oncontextmenu="return false;">
             <source src="test.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
+        <!-- Custom controls -->
+        <div class="custom-audio-controls">
+            <button id="playPauseButton">Play</button>
+        </div>
     </div>
 
-    <!-- Script to prevent right-click and download -->
+    <!-- Script to manage custom play/pause controls and disable downloading -->
     <script>
-        // Prevent right-clicking on the page
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        // Get references to the audio element and play/pause button
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseButton = document.getElementById('playPauseButton');
 
-        // Disable the keyboard shortcuts for downloading
+        // Function to toggle play/pause
+        playPauseButton.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseButton.textContent = 'Pause';
+            } else {
+                audioPlayer.pause();
+                playPauseButton.textContent = 'Play';
+            }
+        });
+
+        // Prevent right-click and download shortcuts
+        document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
                 event.preventDefault();
@@ -37,3 +56,4 @@
     </script>
 </body>
 </html>
+
