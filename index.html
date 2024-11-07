@@ -47,8 +47,53 @@
         </div>
     </div>
 
+    <button onclick="signInWithGoogle()">Sign in with Google</button>
+
     <script type="module">
-        // Firebase import and initialization here...
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
+            authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
+            projectId: "naatiwithsingh-eaea5",
+            storageBucket: "naatiwithsingh-eaea5.appspot.com",
+            messagingSenderId: "630043652454",
+            appId: "1:630043652454:web:717958c7a689ce774718a7",
+            measurementId: "G-N5RV8HFQ1W"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Sign in function
+        function signInWithGoogle() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    console.log("Signed in successfully.");
+                })
+                .catch((error) => {
+                    console.error("Error during sign-in:", error.message);
+                });
+        }
+
+        // Listen for authentication state changes
+        onAuthStateChanged(auth, (user) => {
+            const contentContainer = document.getElementById("contentContainer");
+            const signInButton = document.querySelector("button");
+
+            if (user) {
+                contentContainer.style.display = "block";
+                signInButton.style.display = "none";
+            } else {
+                contentContainer.style.display = "none";
+                signInButton.style.display = "block";
+            }
+        });
 
         let audioPlayer;
         const playPauseButton = document.getElementById('playPauseButton');
