@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Access Page</title>
     <style>
-        /* Centering and styling */
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
         .container { text-align: center; }
         .notice { font-size: 0.9em; color: gray; }
@@ -17,25 +16,28 @@
     <div class="container">
         <h1>Student Audio Access</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
-        <!-- Hidden audio element without controls -->
-        <audio id="audioPlayer" style="display: none;">
-            <source src="test.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        <!-- Custom controls -->
         <div class="custom-audio-controls">
             <button id="playPauseButton">Play</button>
         </div>
     </div>
 
-    <!-- Script to manage custom play/pause controls and disable downloading -->
     <script>
-        // Get references to the audio element and play/pause button
-        const audioPlayer = document.getElementById('audioPlayer');
+        let audioPlayer;
         const playPauseButton = document.getElementById('playPauseButton');
 
-        // Function to toggle play/pause
+        // Stream the audio file with JavaScript
+        function loadAudio() {
+            audioPlayer = new Audio('test.mp3');  // Use relative path or URL here
+            audioPlayer.onended = () => {
+                playPauseButton.textContent = 'Play';
+            };
+        }
+
+        // Initialize audio on button click to prevent autoplay behavior
         playPauseButton.addEventListener('click', () => {
+            if (!audioPlayer) {
+                loadAudio();
+            }
             if (audioPlayer.paused) {
                 audioPlayer.play();
                 playPauseButton.textContent = 'Pause';
@@ -45,10 +47,8 @@
             }
         });
 
-        // Disable right-click context menu to prevent download options
+        // Disable right-click and shortcuts to restrict downloads
         document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // Block common keyboard shortcuts that could trigger download or print
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
                 event.preventDefault();
