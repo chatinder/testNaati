@@ -5,87 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naati With Singh CCL Punjabi Dialogues</title>
     <style>
-        body { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            font-family: Arial, sans-serif; 
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        .container { 
-            text-align: center; 
-            max-width: 600px; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .notice { 
-            font-size: 0.9em; 
-            color: gray; 
-        }
-        .lesson { 
-            margin-top: 20px; 
-        }
-        .lesson h2 { 
-            font-size: 1.2em; 
-            color: #333; 
-        }
-        .audio-buttons { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin-top: 10px;
-        }
-        button { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .custom-audio-controls { 
-            margin-top: 20px; 
-        }
-        #googleSignInButton { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #db4437;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        #googleSignInButton:hover {
-            background-color: #c33d2e;
-        }
-        #logoutButton { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #6c757d;
-            color: white;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-        #logoutButton:hover {
-            background-color: #5a6268;
-        }
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
+        .container { text-align: center; max-width: 500px; display: none; }
+        .notice { font-size: 0.9em; color: gray; }
+        .lesson { margin-top: 20px; }
+        .lesson h2 { font-size: 1.2em; color: #333; }
+        .audio-buttons { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 10px 20px; font-size: 1em; cursor: pointer; }
+        .custom-audio-controls { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="container" id="contentContainer" style="display: none;">
+    <div class="container" id="contentContainer">
         <h1>Naati With Singh CCL Punjabi Dialogues</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
         
@@ -110,113 +41,71 @@
 
         <!-- Single Play/Pause button for the currently selected audio -->
         <div class="custom-audio-controls">
-            <button id="playPauseButton">Play</button>
-            <button id="logoutButton" onclick="logout()">Logout</button>
+            <button id="playPauseButton">Play/Pause</button>
         </div>
     </div>
 
-    <!-- Google Sign-In Button -->
-    <div class="container" id="loginContainer">
-        <h2>Please Sign In</h2>
-        <button id="googleSignInButton">Sign in with Google</button>
-    </div>
-
-    <!-- Firebase SDK Imports -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-
-        // Your web app's Firebase configuration
+    <script>
+        // Firebase Authentication configuration (your existing Firebase config)
         const firebaseConfig = {
-            apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
-            authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
-            projectId: "naatiwithsingh-eaea5",
-            storageBucket: "naatiwithsingh-eaea5.firebasestorage.app",
-            messagingSenderId: "630043652454",
-            appId: "1:630043652454:web:717958c7a689ce774718a7",
-            measurementId: "G-N5RV8HFQ1W"
+            apiKey: "YOUR-API-KEY",
+            authDomain: "YOUR-AUTH-DOMAIN",
+            projectId: "YOUR-PROJECT-ID",
+            storageBucket: "YOUR-STORAGE-BUCKET",
+            messagingSenderId: "YOUR-MESSAGING-SENDER-ID",
+            appId: "YOUR-APP-ID",
+            measurementId: "YOUR-MEASUREMENT-ID"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
-        const provider = new GoogleAuthProvider();
+        firebase.initializeApp(firebaseConfig);
 
-        // Predefined allowed email
-        const allowedEmail = "naatiwithsingh@gmail.com";
-
-        // Get DOM elements
-        const loginContainer = document.getElementById("loginContainer");
+        const auth = firebase.auth();
         const contentContainer = document.getElementById("contentContainer");
-        const googleSignInButton = document.getElementById("googleSignInButton");
-        const playPauseButton = document.getElementById('playPauseButton');
 
-        let audioPlayer = null;
+        // Predefined list of allowed Gmail addresses
+        const allowedEmails = ["allowed-user1@gmail.com", "allowed-user2@gmail.com"]; // Add the emails you want to allow
 
-        // Function to handle Google Sign-In
-        async function googleSignIn() {
-            try {
-                const result = await signInWithPopup(auth, provider);
+        // Function to authenticate the user with Google
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+
+            auth.signInWithPopup(provider).then((result) => {
                 const user = result.user;
                 const userEmail = user.email;
 
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block";
-                    loginContainer.style.display = "none";
+                if (allowedEmails.includes(userEmail)) {
+                    contentContainer.style.display = "block"; // Show content if the user is authorized
                 } else {
                     alert("Access Denied: Unauthorized Email");
-                    await signOut(auth);
+                    auth.signOut(); // Log the user out if the email is not allowed
                 }
-            } catch (error) {
-                console.error("Authentication error:", error);
-                alert(`Authentication failed: ${error.message}. Check the console for more details.`);
-            }
+            }).catch((error) => {
+                console.error("Error during sign-in:", error);
+            });
         }
 
-        // Function to handle Logout
-        async function logout() {
-            try {
-                await signOut(auth);
-                contentContainer.style.display = "none";
-                loginContainer.style.display = "block";
-            } catch (error) {
-                console.error("Error during sign-out:", error);
-                alert("Logout failed. Please try again.");
-            }
-        }
+        // Automatically try to sign in
+        signInWithGoogle();
 
-        // Event listener for Google Sign-In button
-        googleSignInButton.addEventListener("click", googleSignIn);
+        // Audio controls and other functionalities remain unchanged
+        let audioPlayer;
+        const playPauseButton = document.getElementById('playPauseButton');
 
-        // Listen for authentication state changes
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === allowedEmail) {
-                contentContainer.style.display = "block";
-                loginContainer.style.display = "none";
-            } else {
-                contentContainer.style.display = "none";
-                loginContainer.style.display = "block";
-            }
-        });
-
-        // Function to load and play selected audio
+        // Function to load and play the selected audio file
         function loadAndPlayAudio(filePath) {
             if (audioPlayer) {
-                audioPlayer.pause();
+                audioPlayer.pause(); // Stop any currently playing audio
             }
-            audioPlayer = new Audio(filePath);
-            audioPlayer.play();
-            playPauseButton.textContent = 'Pause';
-
+            audioPlayer = new Audio(filePath); // Load the selected audio file
+            audioPlayer.play(); // Automatically start playing it
+            playPauseButton.textContent = 'Pause'; // Update button to show "Pause" status
             audioPlayer.onended = () => {
                 playPauseButton.textContent = 'Play';
             };
         }
 
-        // Event listener for Play/Pause button
+        // Play/Pause control for the currently loaded audio
         playPauseButton.addEventListener('click', () => {
             if (audioPlayer) {
                 if (audioPlayer.paused) {
@@ -231,7 +120,7 @@
             }
         });
 
-        // Disable right-click and certain keyboard shortcuts
+        // Disable right-click and shortcuts to prevent downloading
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
