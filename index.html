@@ -45,61 +45,99 @@
         </div>
     </div>
 
-    <script>
-        const password = "Password"; // Replace with your desired password
-        const contentContainer = document.getElementById("contentContainer");
+    <!-- Google Sign-In button -->
+    <button id="googleSignInButton">Sign In with Google</button>
 
-        // Prompt the user for a password
-        function authenticate() {
-            const enteredPassword = prompt("Enter the access password:");
-            if (enteredPassword === password) {
-                contentContainer.style.display = "block"; // Show content if the password matches
-            } else {
-                document.body.innerHTML = "<h2>Access Denied</h2>"; // Show an "Access Denied" message
-            }
+    <script type="module">
+      // Import the necessary Firebase functions
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
+        authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
+        projectId: "naatiwithsingh-eaea5",
+        storageBucket: "naatiwithsingh-eaea5.firebasestorage.app",
+        messagingSenderId: "630043652454",
+        appId: "1:630043652454:web:717958c7a689ce774718a7",
+        measurementId: "G-N5RV8HFQ1W"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const analytics = getAnalytics(app);
+
+      // Predefined allowed email
+      const allowedEmail = "naatiwithsingh@gmail.com";
+
+      // Get the content container and sign-in button
+      const contentContainer = document.getElementById("contentContainer");
+      const googleSignInButton = document.getElementById("googleSignInButton");
+
+      // Google Sign-In function
+      googleSignInButton.addEventListener("click", async () => {
+        const provider = new GoogleAuthProvider();
+
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
+          const userEmail = user.email;
+
+          if (userEmail === allowedEmail) {
+            contentContainer.style.display = "block"; // Show content for allowed email
+            googleSignInButton.style.display = "none"; // Hide sign-in button after success
+          } else {
+            alert("Access Denied: Unauthorized Email");
+            signOut(auth); // Log out the user if email is not allowed
+          }
+        } catch (error) {
+          console.error("Error during sign-in:", error);
+          alert("Authentication failed. Please try again.");
         }
+      });
 
-        authenticate();
+      // Function to load and play the selected audio
+      let audioPlayer;
+      const playPauseButton = document.getElementById('playPauseButton');
 
-        let audioPlayer;
-        const playPauseButton = document.getElementById('playPauseButton');
-
-        // Function to load and play the selected audio file
-        function loadAndPlayAudio(filePath) {
-            if (audioPlayer) {
-                audioPlayer.pause(); // Stop any currently playing audio
-            }
-            audioPlayer = new Audio(filePath); // Load the selected audio file
-            audioPlayer.play(); // Automatically start playing it
-            playPauseButton.textContent = 'Pause'; // Update button to show "Pause" status
-            audioPlayer.onended = () => {
-                playPauseButton.textContent = 'Play';
-            };
+      function loadAndPlayAudio(filePath) {
+        if (audioPlayer) {
+          audioPlayer.pause(); // Stop any currently playing audio
         }
+        audioPlayer = new Audio(filePath); // Load the selected audio file
+        audioPlayer.play(); // Automatically start playing it
+        playPauseButton.textContent = 'Pause'; // Update button to show "Pause" status
+        audioPlayer.onended = () => {
+          playPauseButton.textContent = 'Play';
+        };
+      }
 
-        // Play/Pause control for the currently loaded audio
-        playPauseButton.addEventListener('click', () => {
-            if (audioPlayer) {
-                if (audioPlayer.paused) {
-                    audioPlayer.play();
-                    playPauseButton.textContent = 'Pause';
-                } else {
-                    audioPlayer.pause();
-                    playPauseButton.textContent = 'Play';
-                }
-            } else {
-                alert("Please select an audio file first.");
-            }
-        });
+      // Play/Pause control for the currently loaded audio
+      playPauseButton.addEventListener('click', () => {
+        if (audioPlayer) {
+          if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseButton.textContent = 'Pause';
+          } else {
+            audioPlayer.pause();
+            playPauseButton.textContent = 'Play';
+          }
+        } else {
+          alert("Please select an audio file first.");
+        }
+      });
 
-        // Disable right-click and shortcuts to prevent downloading
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
-                event.preventDefault();
-                alert("Downloading is disabled on this page.");
-            }
-        });
+      // Disable right-click and shortcuts to prevent downloading
+      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
+          event.preventDefault();
+          alert("Downloading is disabled on this page.");
+        }
+      });
     </script>
 </body>
 </html>
