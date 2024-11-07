@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naati With Singh CCL Punjabi Dialogues</title>
+    <title>Student Audio Access</title>
     <style>
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
         .container { text-align: center; max-width: 500px; display: none; }
@@ -17,21 +17,21 @@
 </head>
 <body>
     <div class="container" id="contentContainer">
-        <h1>Naati With Singh CCL Punjabi Dialogues</h1>
+        <h1>Student Audio Access</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
         
-        <!-- Finance Section -->
+        <!-- Lesson 1 Section -->
         <div class="lesson">
-            <h2>Finance</h2>
+            <h2>Lesson 1</h2>
             <div class="audio-buttons">
                 <button onclick="loadAndPlayAudio('finance/P25_financial.mp3')">Finance - Audio 1</button>
                 <button onclick="loadAndPlayAudio('finance/P38_financial.mp3')">Finance - Audio 2</button>
             </div>
         </div>
         
-        <!-- Housing Section -->
+        <!-- Lesson 2 Section -->
         <div class="lesson">
-            <h2>Housing</h2>
+            <h2>Lesson 2</h2>
             <div class="audio-buttons">
                 <button onclick="loadAndPlayAudio('housing/P5_housing.mp3')">Housing - Audio 1</button>
                 <button onclick="loadAndPlayAudio('housing/P30_housing.mp3')">Housing - Audio 2</button>
@@ -46,49 +46,21 @@
     </div>
 
     <script>
-        // Firebase Authentication configuration (your existing Firebase config)
-        const firebaseConfig = {
-            apiKey: "YOUR-API-KEY",
-            authDomain: "YOUR-AUTH-DOMAIN",
-            projectId: "YOUR-PROJECT-ID",
-            storageBucket: "YOUR-STORAGE-BUCKET",
-            messagingSenderId: "YOUR-MESSAGING-SENDER-ID",
-            appId: "YOUR-APP-ID",
-            measurementId: "YOUR-MEASUREMENT-ID"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-
-        const auth = firebase.auth();
+        const password = "yourPassword"; // Replace with your desired password
         const contentContainer = document.getElementById("contentContainer");
 
-        // Predefined list of allowed Gmail addresses
-        const allowedEmails = ["allowed-user1@gmail.com", "allowed-user2@gmail.com"]; // Add the emails you want to allow
-
-        // Function to authenticate the user with Google
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-
-            auth.signInWithPopup(provider).then((result) => {
-                const user = result.user;
-                const userEmail = user.email;
-
-                if (allowedEmails.includes(userEmail)) {
-                    contentContainer.style.display = "block"; // Show content if the user is authorized
-                } else {
-                    alert("Access Denied: Unauthorized Email");
-                    auth.signOut(); // Log the user out if the email is not allowed
-                }
-            }).catch((error) => {
-                console.error("Error during sign-in:", error);
-            });
+        // Prompt the user for a password
+        function authenticate() {
+            const enteredPassword = prompt("Enter the access password:");
+            if (enteredPassword === password) {
+                contentContainer.style.display = "block"; // Show content if the password matches
+            } else {
+                document.body.innerHTML = "<h2>Access Denied</h2>"; // Show an "Access Denied" message
+            }
         }
 
-        // Automatically try to sign in
-        signInWithGoogle();
+        authenticate();
 
-        // Audio controls and other functionalities remain unchanged
         let audioPlayer;
         const playPauseButton = document.getElementById('playPauseButton');
 
