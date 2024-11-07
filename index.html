@@ -128,7 +128,7 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
             authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
@@ -145,10 +145,10 @@
         const analytics = getAnalytics(app);
         const provider = new GoogleAuthProvider();
 
-        // Predefined allowed email
+        // Allowed email for access
         const allowedEmail = "naatiwithsingh@gmail.com";
 
-        // Get DOM elements
+        // DOM elements
         const loginContainer = document.getElementById("loginContainer");
         const contentContainer = document.getElementById("contentContainer");
         const googleSignInButton = document.getElementById("googleSignInButton");
@@ -156,71 +156,51 @@
 
         let audioPlayer = null;
 
-        // Function to handle Google Sign-In
-        async function googleSignIn() {
+        // Sign-in function
+        window.googleSignIn = async function() {
             try {
-                console.log("Attempting Google Sign-In...");
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 const userEmail = user.email;
 
-                console.log("User signed in with email:", userEmail);
-
                 if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block"; // Show content if email matches
-                    loginContainer.style.display = "none"; // Hide login button
-                    console.log("Access granted to:", userEmail);
+                    contentContainer.style.display = "block";
+                    loginContainer.style.display = "none";
                 } else {
                     alert("Access Denied: Unauthorized Email");
-                    await signOut(auth); // Log out the user if email is not allowed
-                    console.warn("Unauthorized email attempted access:", userEmail);
+                    await signOut(auth);
                 }
             } catch (error) {
-                console.error("Authentication error:", error); // Log full error object
-                alert(`Authentication failed: ${error.message}. Check the console for more details.`);
+                alert(`Authentication failed: ${error.message}`);
             }
-        }
+        };
 
-        // Function to handle Logout
-        async function logout() {
+        // Logout function
+        window.logout = async function() {
             try {
                 await signOut(auth);
-                contentContainer.style.display = "none"; // Hide content
-                loginContainer.style.display = "block"; // Show login button
-                console.log("User signed out successfully.");
+                contentContainer.style.display = "none";
+                loginContainer.style.display = "block";
             } catch (error) {
-                console.error("Error during sign-out:", error);
                 alert("Logout failed. Please try again.");
             }
-        }
+        };
 
-        // Event listener for Google Sign-In button
-        googleSignInButton.addEventListener("click", googleSignIn);
-
-        // Listen for authentication state changes
+        // Auth state changes
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userEmail = user.email;
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block"; // Show content
-                    loginContainer.style.display = "none"; // Hide login button
-                    console.log("User is signed in and authorized:", userEmail);
-                } else {
-                    contentContainer.style.display = "none"; // Hide content
-                    loginContainer.style.display = "block"; // Show login button
-                    console.warn("User is signed in but unauthorized:", userEmail);
-                }
+            if (user && user.email === allowedEmail) {
+                contentContainer.style.display = "block";
+                loginContainer.style.display = "none";
             } else {
-                contentContainer.style.display = "none"; // Hide content
-                loginContainer.style.display = "block"; // Show login button
-                console.log("No user is signed in.");
+                contentContainer.style.display = "none";
+                loginContainer.style.display = "block";
             }
         });
 
-        // Function to load and play selected audio
-        function loadAndPlayAudio(filePath) {
+        // Load and play audio function
+        window.loadAndPlayAudio = function(filePath) {
             if (audioPlayer) {
-                audioPlayer.pause(); // Stop currently playing audio
+                audioPlayer.pause();
             }
             audioPlayer = new Audio(filePath);
             audioPlayer.play();
@@ -228,9 +208,9 @@
             audioPlayer.onended = () => {
                 playPauseButton.textContent = 'Play';
             };
-        }
+        };
 
-        // Event listener for Play/Pause button
+        // Play/pause button event listener
         playPauseButton.addEventListener('click', () => {
             if (audioPlayer) {
                 if (audioPlayer.paused) {
@@ -245,7 +225,7 @@
             }
         });
 
-        // Disable right-click and certain keyboard shortcuts
+        // Disable right-click and specific shortcuts
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
