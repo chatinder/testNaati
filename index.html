@@ -159,11 +159,15 @@
         // Function to handle Google Sign-In
         async function googleSignIn() {
             try {
+                console.log("Attempting to sign in..."); // Debugging log
+
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
+                console.log('User:', user);  // Log user info to confirm successful sign-in
                 const userEmail = user.email;
 
                 if (userEmail === allowedEmail) {
+                    console.log("Email matches, showing content.");
                     contentContainer.style.display = "block";
                     loginContainer.style.display = "none";
                 } else {
@@ -193,6 +197,7 @@
 
         // Listen for authentication state changes
         onAuthStateChanged(auth, (user) => {
+            console.log('Auth state changed:', user);
             if (user && user.email === allowedEmail) {
                 contentContainer.style.display = "block";
                 loginContainer.style.display = "none";
