@@ -8,56 +8,33 @@
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
         .container { text-align: center; max-width: 500px; display: none; }
         .notice { font-size: 0.9em; color: gray; }
-        .lesson { margin-top: 20px; }
-        .lesson h2 { font-size: 1.2em; color: #333; }
-        .audio-buttons { display: flex; flex-direction: column; gap: 10px; }
         button { padding: 10px 20px; font-size: 1em; cursor: pointer; }
-        .custom-audio-controls { margin-top: 20px; }
     </style>
 </head>
 <body>
+    <!-- Sign In Button -->
+    <div id="signInContainer">
+        <h1>Welcome to Naati With Singh</h1>
+        <button id="signInButton">Sign In with Google</button>
+    </div>
+
+    <!-- Content Container (shown after sign-in) -->
     <div class="container" id="contentContainer">
         <h1>Naati With Singh CCL Punjabi Dialogues</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
-        
-        <!-- Finance Section -->
-        <div class="lesson">
-            <h2>Finance</h2>
-            <div class="audio-buttons">
-                <button onclick="loadAndPlayAudio('finance/P25_financial.mp3')">Finance - Audio 1</button>
-                <button onclick="loadAndPlayAudio('finance/P38_financial.mp3')">Finance - Audio 2</button>
-            </div>
-        </div>
-        
-        <!-- Housing Section -->
-        <div class="lesson">
-            <h2>Housing</h2>
-            <div class="audio-buttons">
-                <button onclick="loadAndPlayAudio('housing/P5_housing.mp3')">Housing - Audio 1</button>
-                <button onclick="loadAndPlayAudio('housing/P30_housing.mp3')">Housing - Audio 2</button>
-                <button onclick="loadAndPlayAudio('housing/housing.mp3')">Housing - Audio 3</button>
-            </div>
-        </div>
-
-        <!-- Single Play/Pause button for the currently selected audio -->
-        <div class="custom-audio-controls">
-            <button id="playPauseButton">Play/Pause</button>
-        </div>
     </div>
 
-    <!-- Google Sign-in Button -->
-    <button id="googleSignInButton">Sign in with Google</button>
-
     <script type="module">
+        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
             authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
             projectId: "naatiwithsingh-eaea5",
-            storageBucket: "naatiwithsingh-eaea5.firebasestorage.app",
+            storageBucket: "naatiwithsingh-eaea5.appspot.com",
             messagingSenderId: "630043652454",
             appId: "1:630043652454:web:717958c7a689ce774718a7",
             measurementId: "G-N5RV8HFQ1W"
@@ -66,71 +43,25 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const googleSignInButton = document.getElementById("googleSignInButton");
-        const contentContainer = document.getElementById("contentContainer");
 
-        const allowedEmail = "naatiwithsingh@gmail.com";
-
-        // Google Sign-In
-        googleSignInButton.addEventListener("click", async () => {
+        // Google Sign-In Function
+        async function signInWithGoogle() {
             const provider = new GoogleAuthProvider();
             try {
                 const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                const userEmail = user.email;
-
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block"; // Show content if email matches
-                    googleSignInButton.style.display = "none"; // Hide sign-in button after success
-                } else {
-                    alert("Access Denied: Unauthorized Email");
-                    signOut(auth); // Log out the user if email is not allowed
-                }
+                console.log("User signed in:", result.user);
+                
+                // Hide sign-in button and show content
+                document.getElementById("signInContainer").style.display = "none";
+                document.getElementById("contentContainer").style.display = "block";
             } catch (error) {
-                console.error("Authentication error:", error.message); // Log detailed error
-                alert("Authentication failed. Please try again.");
+                console.error("Error during sign-in:", error);
+                alert(`Error during sign-in: ${error.message}`);
             }
-        });
-
-        let audioPlayer;
-        const playPauseButton = document.getElementById('playPauseButton');
-
-        // Function to load and play the selected audio file
-        function loadAndPlayAudio(filePath) {
-            if (audioPlayer) {
-                audioPlayer.pause(); // Stop any currently playing audio
-            }
-            audioPlayer = new Audio(filePath); // Load the selected audio file
-            audioPlayer.play(); // Automatically start playing it
-            playPauseButton.textContent = 'Pause'; // Update button to show "Pause" status
-            audioPlayer.onended = () => {
-                playPauseButton.textContent = 'Play';
-            };
         }
 
-        // Play/Pause control for the currently loaded audio
-        playPauseButton.addEventListener('click', () => {
-            if (audioPlayer) {
-                if (audioPlayer.paused) {
-                    audioPlayer.play();
-                    playPauseButton.textContent = 'Pause';
-                } else {
-                    audioPlayer.pause();
-                    playPauseButton.textContent = 'Play';
-                }
-            } else {
-                alert("Please select an audio file first.");
-            }
-        });
-
-        // Disable right-click and shortcuts to prevent downloading
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
-                event.preventDefault();
-                alert("Downloading is disabled on this page.");
-            }
-        });
+        // Attach the Google Sign-In function to the button
+        document.getElementById("signInButton").addEventListener("click", signInWithGoogle);
     </script>
 </body>
 </html>
