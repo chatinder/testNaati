@@ -6,10 +6,13 @@
     <title>Student Audio Access</title>
     <style>
         body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
-        .container { text-align: center; }
+        .container { text-align: center; max-width: 500px; }
         .notice { font-size: 0.9em; color: gray; }
-        .custom-audio-controls { margin-top: 10px; }
-        button { padding: 10px 20px; font-size: 1em; margin: 5px; }
+        .lesson { margin-top: 20px; }
+        .lesson h2 { font-size: 1.2em; color: #333; }
+        .audio-buttons { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 10px 20px; font-size: 1em; cursor: pointer; }
+        .custom-audio-controls { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -17,14 +20,25 @@
         <h1>Student Audio Access</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
         
-        <!-- Buttons for each audio file with descriptive labels -->
-        <div>
+        <!-- Lesson 1 Section -->
+        <div class="lesson">
+            <h2>Lesson 1</h2>
+            <div class="audio-buttons">
             <button onclick="loadAndPlayAudio('finance/P25_financial.mp3')">Finance - Audio 1</button>
             <button onclick="loadAndPlayAudio('finance/P38_financial.mp3')">Finance - Audio 2</button>
-           
-            <!-- Add more buttons as needed for each audio file -->
+            </div>
         </div>
         
+        <!-- Lesson 2 Section -->
+        <div class="lesson">
+            <h2>Lesson 2</h2>
+            <div class="audio-buttons">
+            <button onclick="loadAndPlayAudio('housing/P5_housing_mortage_broker_property.mp3')">Finance - Audio 1</button>
+            <button onclick="loadAndPlayAudio('housing/P30_financial_(tax liability).mp3')">Finance - Audio 2</button>
+            <button onclick="loadAndPlayAudio('housing/Punjabi CCL exam dialogue-housing.mp3')">Finance - Audio 2</button>
+            </div>
+        </div>
+
         <!-- Single Play/Pause button for the currently selected audio -->
         <div class="custom-audio-controls">
             <button id="playPauseButton">Play/Pause</button>
