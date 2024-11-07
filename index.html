@@ -5,87 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naati With Singh CCL Punjabi Dialogues</title>
     <style>
-        body { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            font-family: Arial, sans-serif; 
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        .container { 
-            text-align: center; 
-            max-width: 600px; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .notice { 
-            font-size: 0.9em; 
-            color: gray; 
-        }
-        .lesson { 
-            margin-top: 20px; 
-        }
-        .lesson h2 { 
-            font-size: 1.2em; 
-            color: #333; 
-        }
-        .audio-buttons { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin-top: 10px;
-        }
-        button { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .custom-audio-controls { 
-            margin-top: 20px; 
-        }
-        #googleSignInButton { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #db4437;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        #googleSignInButton:hover {
-            background-color: #c33d2e;
-        }
-        #logoutButton { 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            cursor: pointer; 
-            border: none;
-            border-radius: 4px;
-            background-color: #6c757d;
-            color: white;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-        #logoutButton:hover {
-            background-color: #5a6268;
-        }
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; }
+        .container { text-align: center; max-width: 500px; display: none; }
+        .notice { font-size: 0.9em; color: gray; }
+        .lesson { margin-top: 20px; }
+        .lesson h2 { font-size: 1.2em; color: #333; }
+        .audio-buttons { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 10px 20px; font-size: 1em; cursor: pointer; }
+        .custom-audio-controls { margin-top: 20px; }
+        #timeDisplay { margin-top: 10px; font-size: 0.9em; color: #555; }
     </style>
 </head>
 <body>
-    <div class="container" id="contentContainer" style="display: none;">
+    <div class="container" id="contentContainer">
         <h1>Naati With Singh CCL Punjabi Dialogues</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
         
@@ -108,129 +40,48 @@
             </div>
         </div>
 
-        <!-- Single Play/Pause button for the currently selected audio -->
+        <!-- Single Play/Pause button and time display for the currently selected audio -->
         <div class="custom-audio-controls">
-            <button id="playPauseButton">Play</button>
-            <button id="logoutButton" onclick="logout()">Logout</button>
+            <button id="playPauseButton">Play/Pause</button>
+            <div id="timeDisplay">0:00 / 0:00</div>
         </div>
     </div>
 
-    <!-- Google Sign-In Button -->
-    <div class="container" id="loginContainer">
-        <h2>Please Sign In</h2>
-        <button id="googleSignInButton">Sign in with Google</button>
-    </div>
-
-    <!-- Firebase SDK Imports -->
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        // Firebase import and initialization here...
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
-            authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
-            projectId: "naatiwithsingh-eaea5",
-            storageBucket: "naatiwithsingh-eaea5.firebasestorage.app",
-            messagingSenderId: "630043652454",
-            appId: "1:630043652454:web:717958c7a689ce774718a7",
-            measurementId: "G-N5RV8HFQ1W"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
-        const provider = new GoogleAuthProvider();
-
-        // Predefined allowed email
-        const allowedEmail = "naatiwithsingh@gmail.com";
-
-        // Get DOM elements
-        const loginContainer = document.getElementById("loginContainer");
-        const contentContainer = document.getElementById("contentContainer");
-        const googleSignInButton = document.getElementById("googleSignInButton");
+        let audioPlayer;
         const playPauseButton = document.getElementById('playPauseButton');
+        const timeDisplay = document.getElementById('timeDisplay');
 
-        let audioPlayer = null;
-
-        // Function to handle Google Sign-In
-        async function googleSignIn() {
-            try {
-                console.log("Attempting Google Sign-In...");
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                const userEmail = user.email;
-
-                console.log("User signed in with email:", userEmail);
-
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block"; // Show content if email matches
-                    loginContainer.style.display = "none"; // Hide login button
-                    console.log("Access granted to:", userEmail);
-                } else {
-                    alert("Access Denied: Unauthorized Email");
-                    await signOut(auth); // Log out the user if email is not allowed
-                    console.warn("Unauthorized email attempted access:", userEmail);
-                }
-            } catch (error) {
-                console.error("Authentication error:", error); // Log full error object
-                alert(`Authentication failed: ${error.message}. Check the console for more details.`);
-            }
-        }
-
-        // Function to handle Logout
-        async function logout() {
-            try {
-                await signOut(auth);
-                contentContainer.style.display = "none"; // Hide content
-                loginContainer.style.display = "block"; // Show login button
-                console.log("User signed out successfully.");
-            } catch (error) {
-                console.error("Error during sign-out:", error);
-                alert("Logout failed. Please try again.");
-            }
-        }
-
-        // Event listener for Google Sign-In button
-        googleSignInButton.addEventListener("click", googleSignIn);
-
-        // Listen for authentication state changes
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userEmail = user.email;
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block"; // Show content
-                    loginContainer.style.display = "none"; // Hide login button
-                    console.log("User is signed in and authorized:", userEmail);
-                } else {
-                    contentContainer.style.display = "none"; // Hide content
-                    loginContainer.style.display = "block"; // Show login button
-                    console.warn("User is signed in but unauthorized:", userEmail);
-                }
-            } else {
-                contentContainer.style.display = "none"; // Hide content
-                loginContainer.style.display = "block"; // Show login button
-                console.log("No user is signed in.");
-            }
-        });
-
-        // Function to load and play selected audio
+        // Function to load and play the selected audio file
         function loadAndPlayAudio(filePath) {
             if (audioPlayer) {
-                audioPlayer.pause(); // Stop currently playing audio
+                audioPlayer.pause(); // Stop any currently playing audio
             }
+
+            // Create a new audio player for the selected file
             audioPlayer = new Audio(filePath);
             audioPlayer.play();
             playPauseButton.textContent = 'Pause';
+
+            // Update the time display with duration when metadata loads
+            audioPlayer.onloadedmetadata = () => {
+                updateAudioTimeDisplay(0, audioPlayer.duration);
+            };
+
+            // Update the time display as the audio plays
+            audioPlayer.ontimeupdate = () => {
+                updateAudioTimeDisplay(audioPlayer.currentTime, audioPlayer.duration);
+            };
+
+            // Reset play/pause button text when audio ends
             audioPlayer.onended = () => {
                 playPauseButton.textContent = 'Play';
             };
         }
 
-        // Event listener for Play/Pause button
+        // Play/Pause control for the currently loaded audio
         playPauseButton.addEventListener('click', () => {
             if (audioPlayer) {
                 if (audioPlayer.paused) {
@@ -244,6 +95,16 @@
                 alert("Please select an audio file first.");
             }
         });
+
+        // Function to update the time display (current time / duration)
+        function updateAudioTimeDisplay(currentTime, duration) {
+            const formatTime = time => {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+                return `${minutes}:${seconds}`;
+            };
+            timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        }
 
         // Disable right-click and certain keyboard shortcuts
         document.addEventListener('contextmenu', event => event.preventDefault());
