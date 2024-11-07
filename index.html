@@ -5,10 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naati With Singh CCL Punjabi Dialogues</title>
     <style>
-        /* (Same styles as before) */
+        /* Basic styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .audio-buttons {
+            margin: 20px 0;
+        }
+
+        .audio-button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .audio-button:hover {
+            background-color: #45a049;
+        }
+
+        .notice {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .custom-audio-controls {
+            margin-top: 20px;
+        }
+
+        .custom-audio-controls button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .custom-audio-controls button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+    <!-- Main Content Container for Logged-in Users -->
     <div class="container" id="contentContainer" style="display: none;">
         <h1>Naati With Singh CCL Punjabi Dialogues</h1>
         <p class="notice">This audio is for listening only. Downloading and sharing are restricted.</p>
@@ -17,8 +78,8 @@
         <div class="lesson">
             <h2>Finance</h2>
             <div class="audio-buttons">
-                <button id="audio1">Finance - Audio 1</button>
-                <button id="audio2">Finance - Audio 2</button>
+                <button class="audio-button" data-file="finance/P25_financial.mp3">Finance - Audio 1</button>
+                <button class="audio-button" data-file="finance/P38_financial.mp3">Finance - Audio 2</button>
             </div>
         </div>
         
@@ -26,144 +87,111 @@
         <div class="lesson">
             <h2>Housing</h2>
             <div class="audio-buttons">
-                <button id="audio3">Housing - Audio 1</button>
-                <button id="audio4">Housing - Audio 2</button>
-                <button id="audio5">Housing - Audio 3</button>
+                <button class="audio-button" data-file="housing/P5_housing.mp3">Housing - Audio 1</button>
+                <button class="audio-button" data-file="housing/P30_housing.mp3">Housing - Audio 2</button>
+                <button class="audio-button" data-file="housing/housing.mp3">Housing - Audio 3</button>
             </div>
         </div>
 
+        <!-- Custom Play/Pause Button -->
         <div class="custom-audio-controls">
             <button id="playPauseButton">Play</button>
             <button id="logoutButton" onclick="logout()">Logout</button>
         </div>
     </div>
 
-    <!-- Google Sign-In Button -->
+    <!-- Login Container for Google Sign-In -->
     <div class="container" id="loginContainer">
         <h2>Please Sign In</h2>
-        <button id="googleSignInButton">Sign in with Google</button>
+        <button id="googleSignInButton" onclick="googleSignIn()">Sign in with Google</button>
     </div>
 
     <!-- Firebase SDK Imports -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-
-        // Firebase configuration
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBYWlvGwv4RCHMhbX1ABHeaW86qVTYq_mM",
-            authDomain: "naatiwithsingh-eaea5.firebaseapp.com",
-            projectId: "naatiwithsingh-eaea5",
-            storageBucket: "naatiwithsingh-eaea5.firebasestorage.app",
-            messagingSenderId: "630043652454",
-            appId: "1:630043652454:web:717958c7a689ce774718a7",
-            measurementId: "G-N5RV8HFQ1W"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
-        const provider = new GoogleAuthProvider();
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-        // Allowed email for access
-        const allowedEmail = "naatiwithsingh@gmail.com";
-
-        // DOM elements
-        const loginContainer = document.getElementById("loginContainer");
-        const contentContainer = document.getElementById("contentContainer");
-        const googleSignInButton = document.getElementById("googleSignInButton");
-        const playPauseButton = document.getElementById('playPauseButton');
         let audioPlayer = null;
 
-        // Sign-in function
-        window.googleSignIn = async function() {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                const userEmail = user.email;
-
-                if (userEmail === allowedEmail) {
-                    contentContainer.style.display = "block";
-                    loginContainer.style.display = "none";
-                } else {
-                    alert("Access Denied: Unauthorized Email");
-                    await signOut(auth);
-                }
-            } catch (error) {
-                alert(`Authentication failed: ${error.message}`);
-            }
-        };
-
-        // Logout function
-        window.logout = async function() {
-            try {
-                await signOut(auth);
-                contentContainer.style.display = "none";
-                loginContainer.style.display = "block";
-            } catch (error) {
-                alert("Logout failed. Please try again.");
-            }
-        };
-
-        // Auth state changes
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === allowedEmail) {
-                contentContainer.style.display = "block";
-                loginContainer.style.display = "none";
-            } else {
-                contentContainer.style.display = "none";
-                loginContainer.style.display = "block";
-            }
-        });
-
-        // Load and play audio function
+        // Function to play the audio
         function loadAndPlayAudio(filePath) {
             if (audioPlayer) {
                 audioPlayer.pause();
             }
             audioPlayer = new Audio(filePath);
             audioPlayer.play();
-            playPauseButton.textContent = 'Pause';
+            document.getElementById('playPauseButton').textContent = 'Pause';
             audioPlayer.onended = () => {
-                playPauseButton.textContent = 'Play';
+                document.getElementById('playPauseButton').textContent = 'Play';
             };
         }
 
-        // Play/pause button event listener
-        playPauseButton.addEventListener('click', () => {
-            if (audioPlayer) {
-                if (audioPlayer.paused) {
-                    audioPlayer.play();
-                    playPauseButton.textContent = 'Pause';
+        // Add Event Listeners when DOM content is loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add event listeners to audio buttons
+            const audioButtons = document.querySelectorAll(".audio-button");
+            audioButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const filePath = button.getAttribute("data-file");
+                    loadAndPlayAudio(filePath);
+                });
+            });
+
+            // Play/Pause Button Event Listener
+            document.getElementById('playPauseButton').addEventListener('click', () => {
+                if (audioPlayer) {
+                    if (audioPlayer.paused) {
+                        audioPlayer.play();
+                        document.getElementById('playPauseButton').textContent = 'Pause';
+                    } else {
+                        audioPlayer.pause();
+                        document.getElementById('playPauseButton').textContent = 'Play';
+                    }
                 } else {
-                    audioPlayer.pause();
-                    playPauseButton.textContent = 'Play';
+                    alert("Please select an audio file first.");
                 }
-            } else {
-                alert("Please select an audio file first.");
-            }
+            });
         });
 
-        // Disable right-click and specific shortcuts
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && (event.key === 's' || event.key === 'p')) {
-                event.preventDefault();
-                alert("Downloading is disabled on this page.");
-            }
-        });
+        // Google Sign-In Function
+        function googleSignIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    const user = result.user;
+                    console.log("Signed in as:", user.displayName);
+                    document.getElementById("loginContainer").style.display = "none";
+                    document.getElementById("contentContainer").style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error signing in:", error);
+                });
+        }
 
-        // Assign the loadAndPlayAudio function to buttons after DOM is ready
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('audio1').addEventListener('click', () => loadAndPlayAudio('finance/P25_financial.mp3'));
-            document.getElementById('audio2').addEventListener('click', () => loadAndPlayAudio('finance/P38_financial.mp3'));
-            document.getElementById('audio3').addEventListener('click', () => loadAndPlayAudio('housing/P5_housing.mp3'));
-            document.getElementById('audio4').addEventListener('click', () => loadAndPlayAudio('housing/P30_housing.mp3'));
-            document.getElementById('audio5').addEventListener('click', () => loadAndPlayAudio('housing/housing.mp3'));
-        });
+        // Logout Function
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    document.getElementById("loginContainer").style.display = "block";
+                    document.getElementById("contentContainer").style.display = "none";
+                })
+                .catch(error => {
+                    console.error("Error signing out:", error);
+                });
+        }
     </script>
 </body>
 </html>
